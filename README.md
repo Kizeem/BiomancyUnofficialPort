@@ -1,3 +1,16 @@
+> [!NOTE]
+> ## Unofficial Fork — Minecraft 1.21.1 NeoForge Port
+>
+> This is an unofficial fork/port of Biomancy for Minecraft 1.21.1 on NeoForge.
+>
+> The original mod was created by Elenterius, with artwork and game design help from RhinoW. See the full list in [CREDITS.md](CREDITS.md).
+>
+> Like some others, I was starving for Biomancy but wanted it on 1.21.1, so I decided to make this port and publish it with RhinoW's permission.
+>
+> AI was used as a tool for the porting work, so there may be bugs I missed during porting. If you find any, please do not bother the original developers — report them to me instead.
+>
+> ---
+
 <p align="center">
 <img src="media/v2/text_logo_big.png" alt="Biomancy" height="200"/>
 <h1 align="center">Biomancy</h1>
