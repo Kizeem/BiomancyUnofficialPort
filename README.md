@@ -9,6 +9,10 @@
 >
 > AI was used as a tool for the porting work, so there may be bugs I missed during porting. If you find any, please do not bother the original developers — report them to me instead.
 >
+> Balance tweaks in this port:
+> - Ravenous Claws: added auto-attack when hovering over a mob.
+> - Potion Serums: increased crafted yield for parity with the brewing stand.
+>
 > ---
 
 <p align="center">
