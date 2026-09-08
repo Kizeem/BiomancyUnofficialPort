@@ -4,24 +4,32 @@ import com.github.elenterius.biomancy.BiomancyMod;
 import com.github.elenterius.biomancy.init.client.ModRenderTypes;
 import com.mojang.blaze3d.shaders.Uniform;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.common.EventBusSubscriber;
+import javax.annotation.Nullable;
 
 @EventBusSubscriber(modid = BiomancyMod.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public final class PartyTimeShaderHandler {
 
 	private static int ticks = 0;
+	@Nullable
 	private static Uniform time;
 
 	private PartyTimeShaderHandler() {}
 
+	@Nullable
 	private static Uniform getTimeUniform() {
+		ShaderInstance shader = ModRenderTypes.getEntityCutoutPartyTimeShaderOrNull();
+		if (shader == null) {
+			return null;
+		}
 		if (time == null) {
-			time = ModRenderTypes.getEntityCutoutPartyTimeShader().getUniform("Time");
+			time = shader.getUniform("Time");
 		}
 		return time;
 	}
@@ -35,10 +43,15 @@ public final class PartyTimeShaderHandler {
 
 	@SubscribeEvent
 	static void onRenderFramePre(final RenderFrameEvent.Pre event) {
+		Uniform timeUniform = getTimeUniform();
+		if (timeUniform == null) {
+			return;
+		}
+
 		float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
 		float totalTicks = ticks + partialTick;
 		float t = totalTicks * 0.05f; //convert to seconds, ticks/20.0 ~= 1 sec
-		getTimeUniform().set(t);
+		timeUniform.set(t);
 	}
 
 }

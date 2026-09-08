@@ -36,8 +36,13 @@ public final class ModRenderTypes {
 		return ModRenderType.ENTITY_CUTOUT_PARTY_TIME.apply(textureLocation);
 	}
 
+	@Nullable
+	public static ShaderInstance getEntityCutoutPartyTimeShaderOrNull() {
+		return entityCutoutPartyTimeShader;
+	}
+
 	public static ShaderInstance getEntityCutoutPartyTimeShader() {
-		return Objects.requireNonNull(entityCutoutPartyTimeShader, "Attempted to call getEntityCutoutPartyTimeShader before shaders have finished loading.");
+		return Objects.requireNonNull(getEntityCutoutPartyTimeShaderOrNull(), "Attempted to call getEntityCutoutPartyTimeShader before shaders have finished loading.");
 	}
 
 	private static final class ModRenderType extends RenderType {
