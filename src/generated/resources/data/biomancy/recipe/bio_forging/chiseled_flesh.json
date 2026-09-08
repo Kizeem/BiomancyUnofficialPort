@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_forging","bio_forge_tab":"biomancy:blocks","ingredients":[{"ingredient":{"item":"biomancy:flesh_bits"},"count":4},{"ingredient":{"item":"biomancy:bone_fragments"},"count":2}],"nutrientsCost":1,"result":{"id":"biomancy:chiseled_flesh"}}

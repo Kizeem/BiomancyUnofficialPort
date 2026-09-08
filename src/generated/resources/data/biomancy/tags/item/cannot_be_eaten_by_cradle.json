@@ -1,0 +1,34 @@
+{
+  "values": [
+    "minecraft:dragon_egg",
+    "minecraft:spawner",
+    "minecraft:heart_of_the_sea",
+    "minecraft:name_tag",
+    "minecraft:bundle",
+    "minecraft:elytra",
+    {
+      "id": "#c:armors",
+      "required": false
+    },
+    {
+      "id": "#c:tools",
+      "required": false
+    },
+    {
+      "id": "#c:ores/netherite_scrap",
+      "required": false
+    },
+    {
+      "id": "#c:ingots/netherite",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/netherite",
+      "required": false
+    },
+    {
+      "id": "#c:shulker_boxes",
+      "required": false
+    }
+  ]
+}

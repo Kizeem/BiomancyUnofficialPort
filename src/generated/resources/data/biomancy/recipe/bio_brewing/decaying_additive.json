@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_brewing","ingredients":[{"ingredient":{"item":"biomancy:withering_ooze"}},{"ingredient":{"item":"biomancy:withering_ooze"}}],"nutrientsCost":2,"processingTime":40,"reactant":{"item":"biomancy:organic_compound"},"result":{"id":"biomancy:decaying_additive"}}

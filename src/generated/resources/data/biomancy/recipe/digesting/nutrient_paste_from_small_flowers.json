@@ -1,0 +1,11 @@
+{
+  "type": "biomancy:digesting",
+  "ingredient": {
+    "tag": "minecraft:small_flowers"
+  },
+  "nutrientsCost": 2,
+  "processingTime": 180,
+  "result": {
+    "id": "biomancy:nutrient_paste"
+  }
+}

@@ -1,0 +1,98 @@
+package com.github.elenterius.biomancy.api.livingtool;
+
+import com.github.elenterius.biomancy.init.ModSoundEvents;
+import com.github.elenterius.biomancy.styles.TextStyles;
+import com.github.elenterius.biomancy.util.ComponentUtil;
+import com.github.elenterius.biomancy.util.sounds.SoundUtil;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.neoforged.neoforge.common.ItemAbility;
+import org.jetbrains.annotations.ApiStatus;
+
+import java.util.List;
+
+@ApiStatus.Experimental
+public interface SpecialLivingTool extends LivingTool {
+
+	default LivingToolState getLivingToolState(ItemStack livingTool) {
+		CompoundTag tag = livingTool.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+		return LivingToolState.deserialize(tag);
+	}
+
+	default void setLivingToolState(ItemStack livingTool, LivingToolState state) {
+		CompoundTag tag = livingTool.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+		state.serialize(tag);
+		livingTool.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+	}
+
+	default void updateLivingToolState(ItemStack livingTool, ServerLevel level, Player player) {
+		LivingToolState state = getLivingToolState(livingTool);
+		boolean hasNutrients = hasNutrients(livingTool);
+
+		if (state == LivingToolState.DORMANT) {
+			setLivingToolState(livingTool, hasNutrients ? LivingToolState.AWAKENED : LivingToolState.BROKEN);
+			SoundUtil.Server.playItemSound(level, player, ModSoundEvents.FLESH_BLOCK_PLACE.get());
+		}
+		else if (state == LivingToolState.AWAKENED) {
+			setLivingToolState(livingTool, hasNutrients ? LivingToolState.DORMANT : LivingToolState.BROKEN);
+			SoundUtil.Server.playItemSound(level, player, ModSoundEvents.FLESH_BLOCK_HIT.get());
+		}
+	}
+
+	@Override
+	default void onNutrientsChanged(ItemStack livingTool, int oldValue, int newValue) {
+		LivingToolState prevState = getLivingToolState(livingTool);
+		LivingToolState state = prevState;
+
+		if (newValue <= 0) {
+			if (state != LivingToolState.BROKEN) setLivingToolState(livingTool, LivingToolState.BROKEN);
+			return;
+		}
+
+		if (state == LivingToolState.BROKEN) {
+			state = LivingToolState.DORMANT;
+		}
+
+		int maxCost = getLivingToolMaxActionCost(livingTool, state);
+
+		if (newValue < maxCost) {
+			if (state == LivingToolState.AWAKENED) state = LivingToolState.DORMANT;
+			else if (state == LivingToolState.DORMANT) state = LivingToolState.BROKEN;
+		}
+
+		if (state != prevState) setLivingToolState(livingTool, state);
+	}
+
+	default int getLivingItemAbilityCost(ItemStack livingTool, ItemAbility toolAction) {
+		LivingToolState state = getLivingToolState(livingTool);
+		return getLivingItemAbilityCost(livingTool, state, toolAction);
+	}
+
+	default int getLivingItemAbilityCost(ItemStack livingTool, LivingToolState state, ItemAbility toolAction) {
+		return switch (state) {
+			case BROKEN -> 0;
+			case DORMANT -> 1;
+			case AWAKENED -> 2;
+		};
+	}
+
+	default int getLivingToolMaxActionCost(ItemStack livingTool, LivingToolState state) {
+		return ItemAbility.getActions().stream()
+				.filter(livingTool::canPerformAction)
+				.map(toolAction -> getLivingItemAbilityCost(livingTool, state, toolAction))
+				.max(Integer::compareTo)
+				.orElse(0);
+	}
+
+	default void appendLivingToolTooltip(ItemStack stack, List<Component> tooltip) {
+		tooltip.add(getLivingToolState(stack).getTooltip().withStyle(TextStyles.ITALIC_GRAY));
+		tooltip.add(ComponentUtil.EMPTY_LINE);
+		LivingTool.super.appendLivingToolTooltip(stack, tooltip);
+	}
+
+}

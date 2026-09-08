@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"item":"biomancy:packed_flesh_wall"}},"nutrientsCost":2,"processingTime":276,"results":[{"countRange":{"type":"uniform","max":7,"min":3},"item":"biomancy:flesh_bits"},{"countRange":{"type":"uniform","max":3,"min":1},"item":"biomancy:tough_fibers"}]}

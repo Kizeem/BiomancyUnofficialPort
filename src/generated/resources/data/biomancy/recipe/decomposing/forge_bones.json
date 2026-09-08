@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"tag":"c:bones"}},"nutrientsCost":1,"processingTime":150,"results":[{"countRange":{"type":"uniform","max":6,"min":3},"item":"biomancy:bone_fragments"}]}

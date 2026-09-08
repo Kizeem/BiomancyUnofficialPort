@@ -1,0 +1,18 @@
+{
+  "type": "biomancy:decomposing",
+  "input": {
+    "0": {
+      "id": "#forge:bones"
+    }
+  },
+  "output": {
+    "0": {
+      "countRange": {
+        "type": "uniform",
+        "max": 6,
+        "min": 3
+      },
+      "id": "biomancy:bone_fragments"
+    }
+  }
+}

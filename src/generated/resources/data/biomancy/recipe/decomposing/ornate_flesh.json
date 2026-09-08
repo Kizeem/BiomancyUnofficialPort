@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"item":"biomancy:ornate_flesh"}},"nutrientsCost":2,"processingTime":189,"results":[{"countRange":{"type":"uniform","max":3,"min":1},"item":"biomancy:flesh_bits"},{"countRange":{"type":"uniform","max":3,"min":1},"item":"biomancy:bone_fragments"}]}

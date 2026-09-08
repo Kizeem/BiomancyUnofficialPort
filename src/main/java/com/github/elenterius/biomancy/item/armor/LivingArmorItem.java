@@ -1,0 +1,230 @@
+package com.github.elenterius.biomancy.item.armor;
+
+import com.github.elenterius.biomancy.api.livingtool.SimpleLivingTool;
+import com.github.elenterius.biomancy.client.util.ClientTextUtil;
+import com.github.elenterius.biomancy.init.ModSoundEvents;
+import com.github.elenterius.biomancy.styles.ColorStyles;
+import com.github.elenterius.biomancy.util.ArrayUtil;
+import com.github.elenterius.biomancy.util.ComponentUtil;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import javax.annotation.Nullable;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+public class LivingArmorItem extends ArmorItem implements SimpleLivingTool {
+
+	private final int maxNutrients;
+
+	public LivingArmorItem(Holder<ArmorMaterial> material, Type type, int maxNutrients, Properties properties) {
+		super(material, type, properties);
+		this.maxNutrients = maxNutrients;
+	}
+
+	public static int getNutrientsFromEquippedArmor(Player player, Predicate<ItemStack> predicate) {
+		int nutrients = 0;
+		for (ItemStack stackInArmorSlot : player.getArmorSlots()) {
+			if (stackInArmorSlot.getItem() instanceof LivingArmorItem armor && predicate.test(stackInArmorSlot)) {
+				nutrients += armor.getNutrients(stackInArmorSlot);
+			}
+		}
+		return nutrients;
+	}
+
+	public static void consumeNutrientsFromEquippedArmor(Player player, final int amount, Predicate<ItemStack> predicate) {
+		NonNullList<ItemStack> armorSlots = player.getInventory().armor;
+
+		int[] availableNutrients = new int[armorSlots.size()];
+
+		for (int i = 0; i < armorSlots.size(); i++) {
+			ItemStack stackInSlot = armorSlots.get(i);
+			if (stackInSlot.getItem() instanceof LivingArmorItem armor && predicate.test(stackInSlot)) {
+				availableNutrients[i] = armor.getNutrients(stackInSlot);
+			}
+		}
+
+		int[] consumed = consumeBalanced(amount, availableNutrients);
+
+		for (int i = 0; i < armorSlots.size(); i++) {
+			ItemStack stackInSlot = armorSlots.get(i);
+			if (stackInSlot.getItem() instanceof LivingArmorItem armor && consumed[i] > 0) {
+				armor.consumeNutrients(stackInSlot, consumed[i]);
+			}
+		}
+	}
+
+	private static int[] consumeBalanced(final int targetAmount, int... array) {
+		int[] remaining = ArrayUtil.copyOf(array);
+		int[] consumed = new int[array.length];
+
+		int needed = targetAmount;
+
+		while (needed > 0) {
+			if (ArrayUtil.sum(remaining) <= 0) break;
+
+			int validIndices = 0;
+			int index = -1;
+			int max = 0;
+			for (int i = 0; i < remaining.length; i++) {
+				int n = remaining[i];
+				if (n > max) {
+					max = n;
+					index = i;
+				}
+				if (n > 0) validIndices++;
+			}
+
+			if (max == 0) break;
+
+			int nextMax = 0;
+			for (int n : remaining) {
+				if (n < max && n > nextMax) {
+					nextMax = n;
+				}
+			}
+
+			if (nextMax > 0) {
+				int toConsume = Math.min(max - nextMax, needed);
+				consumed[index] += toConsume;
+				remaining[index] -= toConsume;
+			}
+			else {
+				int toConsume = needed / validIndices;
+
+				for (int i = 0; i < remaining.length; i++) {
+					if (remaining[i] > 0) {
+						int min = Math.min(toConsume, remaining[i]);
+						consumed[i] += min;
+						remaining[i] -= min;
+					}
+				}
+
+				int remainder = needed % validIndices;
+				for (int i = 0; i < remainder; i++) {
+					if (remaining[i] > 0) {
+						consumed[i] += 1;
+						remaining[i] -= 1;
+					}
+				}
+			}
+
+			needed = targetAmount - ArrayUtil.sum(consumed);
+		}
+
+		return consumed;
+	}
+
+	@Override
+	public void appendHoverText(ItemStack stack, Item.TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag isAdvanced) {
+		tooltip.addAll(ClientTextUtil.getItemInfoTooltip(stack));
+		tooltip.add(ComponentUtil.EMPTY_LINE);
+
+		appendLivingToolTooltip(stack, tooltip);
+
+		if (stack.isEnchanted()) {
+			tooltip.add(ComponentUtil.EMPTY_LINE);
+		}
+	}
+
+	@Override
+	public int getMaxNutrients(ItemStack container) {
+		return maxNutrients;
+	}
+
+	@Override
+	public net.minecraft.world.item.component.ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+		return getNutrients(stack) > 0 ? super.getDefaultAttributeModifiers(stack) : net.minecraft.world.item.component.ItemAttributeModifiers.EMPTY;
+	}
+
+	@Override
+	public boolean overrideStackedOnOther(ItemStack stack, Slot slot, ClickAction action, Player player) {
+		if (handleOverrideStackedOnOther(stack, slot, action, player)) {
+			playSound(player, ModSoundEvents.FLESHKIN_EAT.get());
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack other, Slot slot, ClickAction action, Player player, SlotAccess access) {
+		if (handleOverrideOtherStackedOnMe(stack, other, slot, action, player, access)) {
+			playSound(player, ModSoundEvents.FLESHKIN_EAT.get());
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isBarVisible(ItemStack stack) {
+		return getNutrients(stack) < getMaxNutrients(stack);
+	}
+
+	@Override
+	public int getBarWidth(ItemStack stack) {
+		return Math.round(getNutrientsPct(stack) * 13f);
+	}
+
+	@Override
+	public int getBarColor(ItemStack stack) {
+		return ColorStyles.NUTRIENTS_FUEL_BAR;
+	}
+
+	@Override
+	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+		return slotChanged;
+	}
+
+	protected void playSound(Player player, SoundEvent soundEvent) {
+		player.playSound(soundEvent, 0.8f, 0.8f + player.level().getRandom().nextFloat() * 0.4f);
+	}
+
+	@Override
+	public boolean isDamageable(ItemStack stack) {
+		return hasNutrients(stack);
+	}
+
+	@Override
+	public boolean isDamaged(ItemStack stack) {
+		return false;
+	}
+
+	@Override
+	public void setDamage(ItemStack stack, int damage) {
+		//do nothing
+	}
+
+	@Override
+	public int getDamage(ItemStack stack) {
+		int max = getMaxNutrients(stack);
+		return Mth.clamp(max - getNutrients(stack), 0, max);
+	}
+
+	@Override
+	public int getMaxDamage(ItemStack stack) {
+		return getMaxNutrients(stack);
+	}
+
+	@Override
+	public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<Item> onBroken) {
+		decreaseNutrients(stack, amount);
+		return 0;
+	}
+
+}

@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"item":"biomancy:malignant_flesh_wall"}},"nutrientsCost":1,"processingTime":18,"results":[{"countRange":{"type":"uniform","max":1,"min":-3},"item":"biomancy:flesh_bits"}]}

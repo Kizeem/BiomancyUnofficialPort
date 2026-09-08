@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_brewing","ingredients":[{"ingredient":{"item":"biomancy:nutrient_paste"}},{"ingredient":{"tag":"minecraft:flowers"}},{"ingredient":{"item":"biomancy:hormone_secretion"}},{"ingredient":{"item":"minecraft:cocoa_beans"}}],"nutrientsCost":2,"processingTime":120,"reactant":{"item":"biomancy:genetic_compound"},"result":{"id":"biomancy:breeding_stimulant"}}

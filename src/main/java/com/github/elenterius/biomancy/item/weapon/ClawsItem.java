@@ -1,0 +1,138 @@
+package com.github.elenterius.biomancy.item.weapon;
+
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.IShearable;
+import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.util.Lazy;
+
+import java.util.List;
+import java.util.Map;
+
+public class ClawsItem extends TieredItem {
+
+	protected final Lazy<Multimap<Attribute, AttributeModifier>> defaultAttributeModifiers;
+
+	public ClawsItem(Tier tier, float baseAttackDamage, float attackSpeedModifier, float attackRangeModifier, Properties properties) {
+		super(tier, properties);
+		float attackDamageModifier = baseAttackDamage + tier.getAttackDamageBonus();
+		defaultAttributeModifiers = Lazy.of(() -> createDefaultAttributeModifiers(attackDamageModifier, attackSpeedModifier, attackRangeModifier).build());
+	}
+
+	protected ImmutableMultimap.Builder<Attribute, AttributeModifier> createDefaultAttributeModifiers(float attackDamageModifier, float attackSpeedModifier, float attackRangeModifier) {
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		builder.put(Attributes.ATTACK_DAMAGE.value(), new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, attackDamageModifier, AttributeModifier.Operation.ADD_VALUE));
+		builder.put(Attributes.ATTACK_SPEED.value(), new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, attackSpeedModifier, AttributeModifier.Operation.ADD_VALUE));
+		builder.put(Attributes.ENTITY_INTERACTION_RANGE.value(), new AttributeModifier(ResourceLocation.withDefaultNamespace("base_attack_range"), attackRangeModifier, AttributeModifier.Operation.ADD_VALUE));
+		return builder;
+	}
+
+	protected static ItemAttributeModifiers createItemAttributeModifiers(Multimap<Attribute, AttributeModifier> modifiers, EquipmentSlotGroup slotGroup) {
+		ItemAttributeModifiers itemModifiers = ItemAttributeModifiers.EMPTY;
+		for (Map.Entry<Attribute, AttributeModifier> entry : modifiers.entries()) {
+			Holder<Attribute> attributeHolder = BuiltInRegistries.ATTRIBUTE.wrapAsHolder(entry.getKey());
+			itemModifiers = itemModifiers.withModifierAdded(attributeHolder, entry.getValue(), slotGroup);
+		}
+		return itemModifiers;
+	}
+
+	@Override
+	public ItemAttributeModifiers getDefaultAttributeModifiers() {
+		return createItemAttributeModifiers(defaultAttributeModifiers.get(), EquipmentSlotGroup.MAINHAND);
+	}
+
+	@Override
+	public boolean canPerformAction(ItemStack stack, ItemAbility toolAction) {
+		return ItemAbilities.DEFAULT_SWORD_ACTIONS.contains(toolAction); //use sword actions
+	}
+
+	@Override
+	public boolean canAttackBlock(BlockState state, Level level, BlockPos pos, Player player) {
+		return !player.isCreative();
+	}
+
+	@Override
+	public float getDestroySpeed(ItemStack stack, BlockState state) {
+		return getDestroySpeed(state);
+	}
+
+	@Override
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
+		return true;
+	}
+
+	@Override
+	public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miningEntity) {
+		if (state.getDestroySpeed(level, pos) != 0f) {
+			stack.hurtAndBreak(2, miningEntity, EquipmentSlot.MAINHAND);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isCorrectToolForDrops(ItemStack stack, BlockState block) {
+		return block.is(Blocks.COBWEB) || block.is(BlockTags.LEAVES);
+	}
+
+	@Override
+	public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
+		if (player.level().isClientSide()) return InteractionResult.PASS;
+		if (shearInteractionTarget(stack, player, interactionTarget, usedHand)) return InteractionResult.SUCCESS;
+		return InteractionResult.PASS;
+	}
+
+	protected float getDestroySpeed(BlockState state) {
+		if (state.is(Blocks.COBWEB)) return 15f;
+		if (state.is(BlockTags.LEAVES)) return 15f;
+		if (state.is(BlockTags.WOOL)) return 5f;
+		return state.is(BlockTags.SWORD_EFFICIENT) ? 1.5F : 1f; //TODO: replace with claws specific tag
+	}
+
+	protected boolean shearInteractionTarget(ItemStack stack, Player player, LivingEntity targetEntity, InteractionHand usedHand) {
+		if (targetEntity instanceof IShearable shearingTarget) {
+			BlockPos pos = targetEntity.blockPosition();
+
+			if (shearingTarget.isShearable(player, stack, targetEntity.level(), pos)) {
+				List<ItemStack> drops = shearingTarget.onSheared(player, stack, targetEntity.level(), pos);
+				RandomSource rand = player.getRandom();
+				drops.forEach(lootStack -> {
+					ItemEntity itemEntity = targetEntity.spawnAtLocation(lootStack, 1f);
+					if (itemEntity != null) {
+						itemEntity.setDeltaMovement(itemEntity.getDeltaMovement().add((rand.nextFloat() - rand.nextFloat()) * 0.1f, rand.nextFloat() * 0.05f, (rand.nextFloat() - rand.nextFloat()) * 0.1f));
+					}
+				});
+				stack.hurtAndBreak(1, targetEntity, usedHand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+}

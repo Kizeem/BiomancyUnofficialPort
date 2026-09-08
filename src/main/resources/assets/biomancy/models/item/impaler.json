@@ -1,0 +1,18 @@
+{
+  "parent": "neoforge:item/default",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "biomancy:item/impaler_display"
+  },
+  "textures": {
+    "particle": "biomancy:item/component/bone_fragments"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "biomancy:item/impaler_icon"
+    },
+    "fixed": {
+      "parent": "biomancy:item/impaler_icon"
+    }
+  }
+}

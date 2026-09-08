@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_forging","bio_forge_tab":"biomancy:misc","ingredients":[{"ingredient":{"item":"biomancy:impermeable_membrane"}},{"ingredient":{"item":"biomancy:regenerative_fluid"},"count":4}],"nutrientsCost":1,"result":{"id":"biomancy:baby_permeable_membrane"}}

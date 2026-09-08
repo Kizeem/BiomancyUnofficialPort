@@ -1,0 +1,7 @@
+{
+  "values": [
+    "#minecraft:enchantable/weapon",
+    { "id": "#c:tools/knives", "required": false },
+    "biomancy:ravenous_claws"
+  ]
+}

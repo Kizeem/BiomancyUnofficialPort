@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"item":"minecraft:lapis_lazuli"}},"nutrientsCost":2,"processingTime":100,"results":[{"countRange":{"type":"uniform","max":1,"min":0},"item":"biomancy:gem_fragments"},{"countRange":{"type":"uniform","max":1,"min":0},"item":"biomancy:exotic_dust"}]}

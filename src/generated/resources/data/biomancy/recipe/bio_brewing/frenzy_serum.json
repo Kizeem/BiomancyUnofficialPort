@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_brewing","ingredients":[{"ingredient":{"item":"biomancy:unstable_compound"}},{"ingredient":{"item":"biomancy:genetic_compound"}},{"ingredient":{"item":"biomancy:acid_extract"}}],"nutrientsCost":2,"processingTime":160,"reactant":{"item":"biomancy:exotic_compound"},"result":{"id":"biomancy:frenzy_serum"}}

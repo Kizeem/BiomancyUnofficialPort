@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_brewing","ingredients":[{"ingredient":{"item":"biomancy:regenerative_fluid"}},{"ingredient":{"item":"biomancy:regenerative_fluid"}}],"nutrientsCost":2,"processingTime":40,"reactant":{"item":"biomancy:organic_compound"},"result":{"id":"biomancy:healing_additive"}}

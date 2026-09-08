@@ -1,0 +1,47 @@
+package com.github.elenterius.biomancy.api.nutrients;
+
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.ApiStatus;
+
+@ApiStatus.Experimental
+public interface FuelHandler {
+
+	int getFuelAmount();
+
+	int getMaxFuelAmount();
+
+	void setFuelAmount(int amount);
+
+	void addFuelAmount(int amount);
+
+	boolean isValidFuel(ItemStack stack);
+
+	int getFuelValue(ItemStack stack);
+
+	default int getFuelCost(int craftingCostNutrients) {
+		return 1;
+	}
+
+	default ItemStack addFuel(ItemStack stack) {
+		if (stack.isEmpty()) return stack;
+		if (!isValidFuel(stack)) return stack;
+
+		int currFuelAmount = getFuelAmount();
+		if (currFuelAmount >= getMaxFuelAmount()) return stack;
+
+		int fuelValue = getFuelValue(stack);
+		if (fuelValue <= 0) return stack;
+
+		int neededCount = Mth.floor(Math.max(0, getMaxFuelAmount() - currFuelAmount) / (float) fuelValue);
+		int consumeCount = Math.min(stack.getCount(), neededCount);
+		if (consumeCount > 0) {
+			int amount = Mth.clamp(currFuelAmount + fuelValue * consumeCount, 0, getMaxFuelAmount());
+			setFuelAmount(amount);
+			return stack.copyWithCount(stack.getCount() - consumeCount);
+		}
+		return stack;
+	}
+}
+

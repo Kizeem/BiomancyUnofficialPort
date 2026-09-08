@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"item":"biomancy:flesh_slab"}},"nutrientsCost":2,"processingTime":78,"results":[{"countRange":{"type":"uniform","max":1,"min":0},"item":"biomancy:flesh_bits"}]}

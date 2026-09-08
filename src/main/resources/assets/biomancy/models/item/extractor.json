@@ -1,0 +1,18 @@
+{
+  "parent": "neoforge:item/default",
+  "loader": "neoforge:separate_transforms",
+  "base": {
+    "parent": "biomancy:item/extractor_display"
+  },
+  "textures": {
+    "particle": "biomancy:item/component/bone_fragments"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "biomancy:item/extractor_icon"
+    },
+    "fixed": {
+      "parent": "biomancy:item/extractor_icon"
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+	"entries": [
+		{
+			"enum": "net/minecraft/world/item/Rarity",
+			"name": "BIOMANCY_COMMON",
+			"constructor": "(ILjava/lang/String;Ljava/util/function/UnaryOperator;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/ModRarities$Proxies",
+				"field": "COMMON"
+			}
+		},
+		{
+			"enum": "net/minecraft/world/item/Rarity",
+			"name": "BIOMANCY_UNCOMMON",
+			"constructor": "(ILjava/lang/String;Ljava/util/function/UnaryOperator;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/ModRarities$Proxies",
+				"field": "UNCOMMON"
+			}
+		},
+		{
+			"enum": "net/minecraft/world/item/Rarity",
+			"name": "BIOMANCY_RARE",
+			"constructor": "(ILjava/lang/String;Ljava/util/function/UnaryOperator;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/ModRarities$Proxies",
+				"field": "RARE"
+			}
+		},
+		{
+			"enum": "net/minecraft/world/item/Rarity",
+			"name": "BIOMANCY_VERY_RARE",
+			"constructor": "(ILjava/lang/String;Ljava/util/function/UnaryOperator;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/ModRarities$Proxies",
+				"field": "VERY_RARE"
+			}
+		},
+		{
+			"enum": "net/minecraft/world/item/Rarity",
+			"name": "BIOMANCY_ULTRA_RARE",
+			"constructor": "(ILjava/lang/String;Ljava/util/function/UnaryOperator;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/ModRarities$Proxies",
+				"field": "ULTRA_RARE"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/RecipeBookCategories",
+			"name": "BIOMANCY_SEARCH",
+			"constructor": "(Ljava/util/function/Supplier;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModRecipeBookCategories",
+				"field": "SEARCH_CATEGORY_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/RecipeBookCategories",
+			"name": "BIOMANCY_BUILDING_BLOCKS",
+			"constructor": "(Ljava/util/function/Supplier;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModRecipeBookCategories",
+				"field": "BUILDING_BLOCKS_CATEGORY_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/RecipeBookCategories",
+			"name": "BIOMANCY_MACHINES",
+			"constructor": "(Ljava/util/function/Supplier;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModRecipeBookCategories",
+				"field": "MACHINES_CATEGORY_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/RecipeBookCategories",
+			"name": "BIOMANCY_TOOLS",
+			"constructor": "(Ljava/util/function/Supplier;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModRecipeBookCategories",
+				"field": "TOOLS_CATEGORY_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/RecipeBookCategories",
+			"name": "BIOMANCY_COMPONENTS",
+			"constructor": "(Ljava/util/function/Supplier;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModRecipeBookCategories",
+				"field": "COMPONENTS_CATEGORY_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/RecipeBookCategories",
+			"name": "BIOMANCY_MISC",
+			"constructor": "(Ljava/util/function/Supplier;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModRecipeBookCategories",
+				"field": "MISC_CATEGORY_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/world/inventory/RecipeBookType",
+			"name": "BIOMANCY_BIO_FORGE",
+			"constructor": "()V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/ModRecipeBookTypes",
+				"field": "BIO_FORGE_PROXY"
+			}
+		},
+		{
+			"enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+			"name": "BIOMANCY_HOLD_AND_AIM_GUN_TWO_HANDED",
+			"constructor": "(ZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+			"parameters": {
+				"class": "com/github/elenterius/biomancy/init/client/ModArmPoses",
+				"field": "HOLD_AND_AIM_GUN_TWO_HANDED_PROXY"
+			}
+		}
+	]
+}

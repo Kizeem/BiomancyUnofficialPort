@@ -1,0 +1,11 @@
+{
+  "type": "biomancy:digesting",
+  "ingredient": {
+    "tag": "minecraft:leaves"
+  },
+  "nutrientsCost": 2,
+  "processingTime": 225,
+  "result": {
+    "id": "biomancy:nutrient_paste"
+  }
+}

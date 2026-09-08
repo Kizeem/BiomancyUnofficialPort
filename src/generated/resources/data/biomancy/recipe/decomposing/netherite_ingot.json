@@ -1,0 +1,1 @@
+{"type":"biomancy:decomposing","ingredient":{"ingredient":{"item":"minecraft:netherite_ingot"}},"nutrientsCost":5,"processingTime":2880,"results":[{"countRange":{"type":"uniform","max":72,"min":43},"item":"biomancy:mineral_fragment"}]}

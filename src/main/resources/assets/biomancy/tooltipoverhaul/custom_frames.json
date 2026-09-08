@@ -1,0 +1,44 @@
+{
+  "frames": [
+    {
+      "texture": "biomancy:textures/gui/tooltip/overlay/flesh_frame_normal.png",
+      "items": [ "biomancy:vial" ],
+      "tags": [
+        "biomancy:normal_type"
+      ],
+      "borderType": "static",
+      "gradientType": "custom",
+      "gradientColors": [ "#FF903E55", "#FF903E55", "#FF903E55" ]
+    },
+    {
+      "texture": "biomancy:textures/gui/tooltip/overlay/flesh_frame_mascot.png",
+      "items": [ "biomancy:injector" ],
+      "tags": [
+        "biomancy:advanced_type"
+      ],
+      "borderType": "static",
+      "gradientType": "custom",
+      "gradientColors": [ "#FF903E55", "#FF903E55", "#FF903E55" ]
+    },
+    {
+      "texture": "biomancy:textures/gui/tooltip/overlay/flesh_frame_mascot_green.png",
+      "items": [ "biomancy:bio_forge" ],
+      "tags": [
+        "biomancy:special_type"
+      ],
+      "borderType": "static",
+      "gradientType": "custom",
+      "gradientColors": [ "#FF903E55", "#FF903E55", "#FF903E55" ]
+    },
+    {
+      "texture": "biomancy:textures/gui/tooltip/overlay/flesh_frame_primordial.png",
+      "items": [ "biomancy:primordial_cradle" ],
+      "tags": [
+        "biomancy:primordial_type"
+      ],
+      "borderType": "static",
+      "gradientType": "custom",
+      "gradientColors": [ "#FF903E55", "#FF903E55", "#FF903E55" ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "#c:raw_pork",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:ham",
+      "required": false
+    }
+  ]
+}

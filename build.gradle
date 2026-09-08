@@ -1,0 +1,251 @@
+import groovy.json.JsonException
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+	id 'net.neoforged.moddev' version '2.0.144'
+	id 'idea'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+	distributionType = Wrapper.DistributionType.BIN
+}
+
+def mod_version = mod_major_version + '.' + mod_semantic_version
+
+version = "${minecraft_version}-${mod_version}"
+group = mod_group_id
+
+sourceSets.main.resources {
+	srcDir('src/generated/resources')
+	exclude('.cache/')
+	exclude(".wiki_data/")
+	exclude(".wiki_content/")
+	exclude("**/*.bbmodel")
+}
+
+repositories {
+	mavenLocal()
+	maven { url = "https://maven.theillusivec4.top/" }
+	maven { url = 'https://maven.blamejared.com/' }
+	maven {
+		url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+		content {
+			includeGroupByRegex("software\\.bernie.*")
+			includeGroup("com.eliotlash.mclib")
+		}
+	}
+	maven {
+		url "https://maven.latvian.dev/releases"
+		content {
+			includeGroup "dev.latvian.mods"
+			includeGroup "dev.latvian.apps"
+		}
+	}
+	maven {
+		url "https://jitpack.io"
+	}
+	maven {
+		url "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
+}
+
+base {
+	archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+	version = project.neo_version
+
+	runs {
+		client {
+			client()
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+		}
+
+		server {
+			server()
+			programArgument '--nogui'
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+		}
+
+		gameTestServer {
+			type = "gameTestServer"
+			systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+		}
+
+		data {
+			data()
+			programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+		}
+
+		configureEach {
+			systemProperty 'forge.logging.markers', 'REGISTRIES'
+			logLevel = org.slf4j.event.Level.DEBUG
+			systemProperty('geckolib.disable_examples', 'true')
+			systemProperty('biomancy.dev_mode', 'true')
+		}
+	}
+
+	mods {
+		"${mod_id}" {
+			sourceSet(sourceSets.main)
+		}
+	}
+}
+
+configurations {
+	runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+	implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
+	implementation "com.github.Virtuoel:Pehkui:${pehkui_version}"
+
+	compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
+	localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+
+	compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+	localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+	compileOnly "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
+
+	implementation "maven.modrinth:farmers-delight:${farmers_delight_version}"
+
+	// Tetra and mutil come from mavenLocal; publish them before building here:
+	//   cd "../Tetra-Refreshed-1.21.1" && ./gradlew.bat publishToMavenLocal
+	//   cd "../Mutil-Refreshed-1.21.1" && ./gradlew.bat publishToMavenLocal
+	compileOnly "se.mickelus.tetra:tetra:1.21.1-6.13.0"
+	compileOnly "se.mickelus.mutil:mutil:1.21.1-6.3.1"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+	var replaceProperties = [
+			minecraft_version      : minecraft_version,
+			minecraft_version_range: minecraft_version_range,
+			neo_version            : neo_version,
+			neo_version_range      : neo_version_range,
+			loader_version_range   : loader_version_range,
+			mod_id                 : mod_id,
+			mod_name               : mod_name,
+			mod_license            : mod_license,
+			mod_version            : "${minecraft_version}-${mod_version}",
+			mod_authors            : mod_authors,
+			mod_credits            : mod_credits,
+			mod_description        : mod_description,
+			mod_url                : mod_url,
+			mod_issue_url          : mod_issue_url,
+			mod_update_url         : mod_update_url,
+			geckolib_version       : geckolib_version,
+			geckolib_version_range : geckolib_version_range,
+			jei_version            : jei_version,
+			jei_version_range      : jei_version_range,
+			curios_version         : curios_version,
+			curios_version_range   : curios_version_range,
+	]
+	inputs.properties replaceProperties
+	expand replaceProperties
+	from "src/main/templates"
+	into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+var minifyJsonResources = tasks.register("minifyJsonResources") {
+	inputs.files(processResources.outputs.files)
+
+	doLast { task ->
+		inputs.files.files.each { root ->
+			if (!root.exists()) return
+
+			root.eachFileRecurse { file ->
+				if (file.name.endsWith(".json")) {
+					file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+					logger.info("Minified: {}", file)
+				}
+			}
+		}
+	}
+}
+
+jar {
+	dependsOn(minifyJsonResources)
+
+	manifest.attributes([
+			'Specification-Title'     : mod_name,
+			'Specification-Vendor'    : mod_vendor,
+			'Specification-Version'   : mod_major_version,
+			'Implementation-Title'    : project.name,
+			'Implementation-Version'  : project.jar.archiveVersion,
+			'Implementation-Vendor'   : mod_vendor,
+			'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+	])
+
+	from { ["CREDITS.md", "LICENSE.txt", "3RD_PARTY_LICENSE.txt"] }
+}
+
+publishing {
+	publications {
+		register('mavenJava', MavenPublication) {
+			from components.java
+			groupId project.group
+			artifactId project.base.archivesName.get()
+			version project.version
+		}
+	}
+	repositories {
+		if (System.getenv("local_maven") != null) {
+			maven {
+				url = uri("file://${System.getenv("local_maven")}")
+			}
+		}
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.compilerArgs.addAll(['-Xmaxerrs', '20000'])
+}
+
+idea {
+	module {
+		downloadSources = true
+		downloadJavadoc = true
+	}
+}
+
+processResources {
+	doLast {
+		if (project.hasProperty("minify")) {
+			def jsonMinifyStart = System.currentTimeMillis()
+			def jsonMinified = 0
+			def jsonBytesSaved = 0
+
+			fileTree(dir: outputs.files.asPath, include: '**/*.json').each {
+
+				File file = it
+				jsonMinified++
+				def oldLength = file.length()
+				try {
+					file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+				} catch (JsonException ignored) {
+					throw new JsonException("Failed to parse json in " + file.path)
+				}
+				file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+				jsonBytesSaved += oldLength - file.length()
+			}
+
+			println('Minified ' + jsonMinified + ' json files. Saved ' + jsonBytesSaved + ' bytes. Took ' + (System.currentTimeMillis() - jsonMinifyStart) + 'ms.')
+		} else {
+			println('Skipping json minification')
+		}
+	}
+}

@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_brewing","ingredients":[{"ingredient":{"item":"biomancy:bile"}},{"ingredient":{"item":"biomancy:bile"}},{"ingredient":{"item":"biomancy:organic_matter"}},{"ingredient":{"item":"biomancy:nutrients"}}],"nutrientsCost":2,"processingTime":40,"reactant":{"item":"biomancy:vial"},"result":{"id":"biomancy:organic_compound"}}

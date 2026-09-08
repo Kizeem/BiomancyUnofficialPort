@@ -1,0 +1,259 @@
+package com.github.elenterius.biomancy.item;
+
+import com.github.elenterius.biomancy.block.modularlarynx.MobSoundType;
+import com.github.elenterius.biomancy.client.util.ClientTextUtil;
+import com.github.elenterius.biomancy.init.ModEnchantments;
+import com.github.elenterius.biomancy.init.ModItems;
+import com.github.elenterius.biomancy.util.ComponentUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import javax.annotation.Nullable;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public class EssenceItem extends Item implements ItemTooltipStyleProvider {
+
+	public static final String ENTITY_TYPE_KEY = "entity_type";
+	public static final String ESSENCE_DATA_KEY = "essence_data";
+	public static final String COLORS_KEY = "colors";
+	public static final String SOUNDS_KEY = "sounds";
+	public static final String ENTITY_NAME_KEY = "name";
+	public static final String ENTITY_UUID_KEY = "entity_uuid";
+	public static final String ESSENCE_TIER_KEY = "essence_tier";
+	public static final String PLAYER_NAME_KEY = "player_name";
+
+	public EssenceItem(Properties properties) {
+		super(properties);
+	}
+
+	public static ItemStack fromEntity(LivingEntity livingEntity, int surgicalPrecisionLevel, int lootingLevel) {
+		int count = 1 + livingEntity.getRandom().nextInt(0, 1 + lootingLevel);
+
+		float precisionFactor = (float) surgicalPrecisionLevel / ModEnchantments.getMaxLevel(ModEnchantments.SURGICAL_PRECISION, livingEntity.level());
+		int bonus = livingEntity.getRandom().nextFloat() < Mth.lerp(precisionFactor, 0.5f, 0.125f) ? 1 : 0;
+		int tier = Mth.clamp(surgicalPrecisionLevel + bonus, 1, 3);
+
+		EssenceItem essenceItem = (EssenceItem) ModItems.ESSENCE.get();
+		ItemStack stack = new ItemStack(essenceItem, count);
+
+		if (essenceItem.setEssenceData(stack, tier, livingEntity)) {
+			if (tier >= 3 && livingEntity instanceof Player player) {
+				CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+				tag.putString(PLAYER_NAME_KEY, player.getGameProfile().getName());
+				stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
+			}
+			return stack;
+		}
+
+		return ItemStack.EMPTY;
+	}
+
+	public static ItemStack fromEntityType(EntityType<?> entityType, UUID entityUUID) {
+		return fromEntityType(entityType, entityUUID, 3);
+	}
+
+	public static ItemStack fromEntityType(EntityType<?> entityType, int essenceTier) {
+		return fromEntityType(entityType, null, Mth.clamp(essenceTier, 0, 3));
+	}
+
+	private static ItemStack fromEntityType(EntityType<?> entityType, @Nullable UUID entityUUID, int essenceTier) {
+		EssenceItem essenceItem = (EssenceItem) ModItems.ESSENCE.get();
+		ItemStack stack = new ItemStack(essenceItem, 1);
+
+		int[] colors = getEssenceColors(entityType, entityUUID, essenceTier);
+
+		if (essenceItem.setEssenceData(stack, essenceTier, entityType, null, colors, null)) {
+			return stack;
+		}
+
+		return ItemStack.EMPTY;
+	}
+
+	public static int[] getEssenceColors(LivingEntity livingEntity, int tier) {
+		return getEssenceColors(livingEntity.getType(), livingEntity.getUUID(), tier);
+	}
+
+	public static int[] getEssenceColors(EntityType<?> entityType, @Nullable UUID entityUUID, int tier) {
+		if (entityType == EntityType.PLAYER && entityUUID != null && tier >= 3) {
+			return getEssenceColors(entityUUID);
+		}
+		return getEssenceColors(entityType);
+	}
+
+	public static int[] getEssenceColors(UUID uuid) {
+		int background = (int) (uuid.getMostSignificantBits() & 0xffffff);
+		int highlight = (int) (uuid.getLeastSignificantBits() & 0xffffff);
+		return new int[]{background, highlight};
+	}
+
+	public static int[] getEssenceColors(EntityType<?> entityType) {
+		if (entityType == EntityType.PLAYER) {
+			return new int[]{0x00AFAF, 0x463AA5}; //steve colors
+		}
+
+		SpawnEggItem spawnEggItem = DeferredSpawnEggItem.deferredOnlyById(entityType);
+		if (spawnEggItem != null) {
+			int background = spawnEggItem.getColor(0);
+			int highlight = spawnEggItem.getColor(1);
+			return new int[]{background, highlight};
+		}
+		else {
+			//handle mobs that don't have spawn eggs
+			ResourceLocation key = EntityType.getKey(entityType);
+			int background = key.hashCode() & 0xffffff;
+			int highlight = key.toString().hashCode() & 0xffffff;
+			return new int[]{background, highlight};
+		}
+	}
+
+	public boolean isValidSamplingTarget(LivingEntity livingEntity) {
+		return true;
+	}
+
+	public boolean setEssenceData(ItemStack stack, int tier, LivingEntity livingEntity) {
+		boolean isValidEntity = livingEntity.isAlive() && isValidSamplingTarget(livingEntity);
+		if (!isValidEntity) return false;
+
+		UUID entityUUID = tier >= 3 ? livingEntity.getUUID() : null;
+		int[] colors = getEssenceColors(livingEntity, tier);
+
+		CompoundTag mobSounds = MobSoundType.saveSounds(livingEntity);
+
+		return setEssenceData(stack, tier, livingEntity.getType(), entityUUID, colors, mobSounds);
+	}
+
+	public boolean setEssenceData(ItemStack stack, int tier, EntityType<?> entityType, @Nullable UUID entityUUID, int[] colors, @Nullable CompoundTag mobSounds) {
+		if (entityType != EntityType.PLAYER && !entityType.canSerialize()) return false;
+
+		ResourceLocation entityTypeId = EntityType.getKey(entityType);
+
+		CompoundTag essenceTag = new CompoundTag();
+		essenceTag.putString(ENTITY_TYPE_KEY, entityTypeId.toString());
+		essenceTag.putString(ENTITY_NAME_KEY, entityType.getDescriptionId());
+
+		if (entityUUID != null) {
+			essenceTag.putUUID(ENTITY_UUID_KEY, entityUUID);
+		}
+
+		CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+		tag.put(ESSENCE_DATA_KEY, essenceTag);
+		tag.putIntArray(COLORS_KEY, colors);
+		if (tier > 0) tag.putInt(ESSENCE_TIER_KEY, tier);
+
+		if (mobSounds != null) {
+			tag.put(SOUNDS_KEY, mobSounds);
+		}
+
+		stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
+
+		return true;
+
+	}
+
+	public boolean isValid(ItemStack stack) {
+		return getEntityType(stack).isPresent();
+	}
+
+	public Optional<EntityType<?>> getEntityType(ItemStack stack) {
+		CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().getCompound(ESSENCE_DATA_KEY);
+		return EntityType.byString(tag.getString(ENTITY_TYPE_KEY));
+	}
+
+	public Optional<UUID> getEntityUUID(ItemStack stack) {
+		CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().getCompound(ESSENCE_DATA_KEY);
+		if (tag.hasUUID(ENTITY_UUID_KEY)) {
+			return Optional.of(tag.getUUID(ENTITY_UUID_KEY));
+		}
+		return Optional.empty();
+	}
+
+	public Optional<SoundEvent> getMobSound(ItemStack stack, MobSoundType soundType) {
+		CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag().getCompound(SOUNDS_KEY);
+		return Optional.ofNullable(soundType.getSound(tag));
+	}
+
+	public int getColor(ItemStack stack, int tintIndex) {
+		CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+		if (tag.contains(COLORS_KEY, Tag.TAG_INT_ARRAY)) {
+			int[] colors = tag.getIntArray(COLORS_KEY);
+			return tintIndex == 0 ? colors[0] : colors[1];
+		}
+		return -1;
+	}
+
+	public int[] getColors(ItemStack stack) {
+		CompoundTag tag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+		if (tag.contains(COLORS_KEY, Tag.TAG_INT_ARRAY)) {
+			return tag.getIntArray(COLORS_KEY);
+		}
+
+		return new int[]{0xffff_ffff, 0xffff_ffff};
+	}
+
+	@Override
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag isAdvanced) {
+		tooltip.addAll(ClientTextUtil.getItemInfoTooltip(stack));
+
+		CompoundTag compoundTag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+
+		if (compoundTag.contains(ESSENCE_DATA_KEY)) {
+			CompoundTag tag = compoundTag.getCompound(ESSENCE_DATA_KEY);
+
+			if (tag.hasUUID(ENTITY_UUID_KEY)) {
+				tooltip.add(ComponentUtil.EMPTY_LINE);
+
+				UUID entityUUID = tag.getUUID(ENTITY_UUID_KEY);
+
+				if (tag.getString(ENTITY_NAME_KEY).equals(EntityType.PLAYER.getDescriptionId()) && compoundTag.contains(PLAYER_NAME_KEY)) {
+					String name = compoundTag.getString(PLAYER_NAME_KEY);
+					tooltip.add(ComponentUtil.literal("Player: " + name).withStyle(ChatFormatting.GRAY));
+				}
+				else {
+					tooltip.add(ComponentUtil.literal("UUID: " + entityUUID).withStyle(ChatFormatting.GRAY));
+				}
+			}
+		}
+
+		int tier = compoundTag.getInt(ESSENCE_TIER_KEY);
+		if (tier > 0) {
+			tooltip.add(ComponentUtil.EMPTY_LINE);
+			tooltip.add(ComponentUtil.literal("Tier: " + tier));
+		}
+	}
+
+	@Override
+	public Component getName(ItemStack stack) {
+		CompoundTag compoundTag = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY).copyTag();
+
+		if (!compoundTag.contains(ESSENCE_DATA_KEY)) {
+			return Component.translatable(getDescriptionId(stack));
+		}
+
+		CompoundTag tag = compoundTag.getCompound(ESSENCE_DATA_KEY);
+		MutableComponent entityName = ComponentUtil.translatable(tag.getString(ENTITY_NAME_KEY));
+
+		if (tag.hasUUID(ENTITY_UUID_KEY)) {
+			return Component.translatable(getDescriptionId(stack) + ".unique_mob", entityName);
+		}
+
+		return Component.translatable(getDescriptionId(stack) + ".mob", entityName);
+	}
+
+}

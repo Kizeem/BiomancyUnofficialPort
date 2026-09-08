@@ -1,0 +1,11 @@
+{
+  "type": "biomancy:digesting",
+  "ingredient": {
+    "item": "minecraft:moss_carpet"
+  },
+  "nutrientsCost": 2,
+  "processingTime": 180,
+  "result": {
+    "id": "biomancy:nutrient_paste"
+  }
+}

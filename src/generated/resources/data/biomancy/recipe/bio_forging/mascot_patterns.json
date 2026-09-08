@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_forging","bio_forge_tab":"biomancy:misc","ingredients":[{"ingredient":{"item":"biomancy:organic_matter"},"count":8},{"ingredient":{"item":"minecraft:spider_eye"}},{"ingredient":{"item":"biomancy:bile"},"count":4}],"nutrientsCost":1,"result":{"id":"biomancy:mascot_patterns"}}

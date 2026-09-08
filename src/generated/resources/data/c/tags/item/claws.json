@@ -1,0 +1,13 @@
+{
+  "values": [
+    "biomancy:mob_claw",
+    {
+      "id": "alexsmobs:dropbear_claw",
+      "required": false
+    },
+    {
+      "id": "iceandfire:hippogryph_talon",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+package com.github.elenterius.biomancy.inventory;
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
+public class FixedSizeItemStackHandler extends ItemStackHandler implements SerializableItemHandler {
+
+	public FixedSizeItemStackHandler(int size) {
+		super(size);
+	}
+
+	@Override
+	public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+		ListTag list = new ListTag();
+
+		for (int i = 0; i < stacks.size(); i++) {
+			if (stacks.get(i).isEmpty()) continue;
+
+			CompoundTag itemTag = new CompoundTag();
+			itemTag.putInt("Slot", i);
+			stacks.get(i).save(provider, itemTag);
+			list.add(itemTag);
+		}
+
+		CompoundTag tag = new CompoundTag();
+		tag.put("Items", list);
+		return tag;
+	}
+
+	@Override
+	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+		setSize(stacks.size()); //fixed size
+
+		ListTag list = tag.getList("Items", Tag.TAG_COMPOUND);
+
+		for (int i = 0; i < list.size(); i++) {
+			CompoundTag itemTag = list.getCompound(i);
+			int slotIndex = itemTag.getInt("Slot");
+
+			if (slotIndex >= 0 && slotIndex < stacks.size()) {
+				stacks.set(slotIndex, ItemStack.parseOptional(provider, itemTag));
+			}
+		}
+
+		onLoad();
+	}
+
+}

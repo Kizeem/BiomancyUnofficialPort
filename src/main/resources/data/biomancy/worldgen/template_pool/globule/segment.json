@@ -1,0 +1,60 @@
+{
+  "name": "biomancy:globule/segment",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 50,
+      "element": {
+        "location": "biomancy:globule/globule_passage",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 50,
+      "element": {
+        "location": "biomancy:globule/globule_room",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 50,
+      "element": {
+        "location": "biomancy:globule/globule_tee",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 44,
+      "element": {
+        "location": "biomancy:globule/globule_cradle",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 40,
+      "element": {
+        "location": "biomancy:globule/globule_acid",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    },
+    {
+      "weight": 46,
+      "element": {
+        "location": "biomancy:globule/globule_spikes",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
+  ]
+}

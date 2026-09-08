@@ -1,0 +1,1 @@
+{"type":"biomancy:bio_forging","bio_forge_tab":"biomancy:tools","ingredients":[{"ingredient":{"item":"biomancy:grenade_casing"}},{"ingredient":{"item":"biomancy:withering_ooze"},"count":2},{"ingredient":{"item":"biomancy:decaying_additive"},"count":2}],"nutrientsCost":1,"result":{"id":"biomancy:decay_grenade"}}

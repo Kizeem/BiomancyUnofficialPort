@@ -1,0 +1,201 @@
+{
+	"format_version": "1.21.20",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.injector",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "root",
+					"pivot": [-2.18219, 2.286, 1.95757]
+				},
+				{
+					"name": "injector",
+					"parent": "root",
+					"pivot": [-2.18219, 2.286, 1.95757],
+					"cubes": [
+						{
+							"origin": [-2, -1, -1],
+							"size": [5, 5, 10],
+							"uv": {
+								"north": {"uv": [11, 26], "uv_size": [5, 5]},
+								"east": {"uv": [1, 26], "uv_size": [10, 5]},
+								"south": {"uv": [26, 26], "uv_size": [5, 5]},
+								"west": {"uv": [16, 26], "uv_size": [10, 5]},
+								"up": {"uv": [11, 16], "uv_size": [5, 10]},
+								"down": {"uv": [16, 26], "uv_size": [5, -10]}
+							}
+						},
+						{
+							"origin": [-3, 0, -4],
+							"size": [3, 3, 11],
+							"uv": {
+								"north": {"uv": [32, 11], "uv_size": [3, 3]},
+								"east": {"uv": [21, 11], "uv_size": [11, 3]},
+								"south": {"uv": [46, 11], "uv_size": [3, 3]},
+								"west": {"uv": [35, 11], "uv_size": [11, 3]},
+								"up": {"uv": [32, 0], "uv_size": [3, 11]},
+								"down": {"uv": [35, 11], "uv_size": [3, -11]}
+							}
+						},
+						{
+							"origin": [0, 1.5, -4],
+							"size": [2, 0, 3],
+							"uv": {
+								"up": {"uv": [12, 8], "uv_size": [2, 3]}
+							}
+						},
+						{
+							"origin": [-7, 1.5, -4],
+							"size": [4, 0, 9],
+							"uv": {
+								"up": {"uv": [5, 9], "uv_size": [4, 9]}
+							}
+						}
+					]
+				},
+				{
+					"name": "arm_bone",
+					"parent": "injector",
+					"pivot": [0.65, 1.25, 9.25],
+					"rotation": [-90, 0, 90]
+				},
+				{
+					"name": "arm_placeholder",
+					"parent": "arm_bone",
+					"pivot": [0.4, 1.25, 9.25],
+					"rotation": [0, 0, -90],
+					"cubes": [
+						{
+							"origin": [-9.6, -0.75, 7.25],
+							"size": [12, 4, 4],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [1, 1]},
+								"east": {"uv": [0, 0], "uv_size": [0.26667, 1]},
+								"south": {"uv": [0, 0], "uv_size": [1, 1]},
+								"west": {"uv": [0, 0], "uv_size": [0.26667, 1]},
+								"up": {"uv": [1, 1], "uv_size": [-1, -1]},
+								"down": {"uv": [1, 1], "uv_size": [-1, -1]}
+							}
+						}
+					]
+				},
+				{
+					"name": "needle",
+					"parent": "injector",
+					"pivot": [-0.75, 1.5, -4],
+					"cubes": [
+						{
+							"origin": [-1, 1, -9],
+							"size": [1, 1, 5],
+							"uv": {
+								"north": {"uv": [14, 5], "uv_size": [1, 1]},
+								"east": {"uv": [9, 5], "uv_size": [5, 1]},
+								"south": {"uv": [20, 5], "uv_size": [1, 1]},
+								"west": {"uv": [15, 5], "uv_size": [5, 1]},
+								"up": {"uv": [14, 0], "uv_size": [1, 5]},
+								"down": {"uv": [15, 5], "uv_size": [1, -5]}
+							}
+						},
+						{
+							"origin": [-2, 1.5, -10],
+							"size": [2, 0, 6],
+							"uv": {
+								"up": {"uv": [0, 9], "uv_size": [2, 6]}
+							}
+						}
+					]
+				},
+				{
+					"name": "serum",
+					"parent": "injector",
+					"pivot": [-2.3209, 2.24767, 3],
+					"rotation": [0, 0, -45],
+					"cubes": [
+						{
+							"origin": [-3.29207, 0.65865, 2],
+							"size": [2, 6, 2],
+							"uv": {
+								"north": {"uv": [24, 3], "uv_size": [2, 6]},
+								"east": {"uv": [22, 3], "uv_size": [2, 6]},
+								"south": {"uv": [28, 3], "uv_size": [2, 6]},
+								"west": {"uv": [26, 3], "uv_size": [2, 6]},
+								"up": {"uv": [24, 1], "uv_size": [2, 2]},
+								"down": {"uv": [26, 3], "uv_size": [2, -2]}
+							}
+						}
+					]
+				},
+				{
+					"name": "_serum_core",
+					"parent": "serum",
+					"pivot": [-2.29207, 2.40865, 3],
+					"cubes": [
+						{
+							"origin": [-3.29207, 0.40865, 2],
+							"size": [2, 6, 2],
+							"inflate": -0.1,
+							"uv": {
+								"north": {"uv": [2, 2], "uv_size": [2, 6]},
+								"east": {"uv": [0, 2], "uv_size": [2, 6]},
+								"south": {"uv": [6, 2], "uv_size": [2, 6]},
+								"west": {"uv": [4, 2], "uv_size": [2, 6]},
+								"up": {"uv": [2, 0], "uv_size": [2, 2]},
+								"down": {"uv": [4, 2], "uv_size": [2, -2]}
+							}
+						}
+					]
+				},
+				{
+					"name": "serum_support",
+					"parent": "injector",
+					"pivot": [-3.2883, 1.90886, 2],
+					"cubes": [
+						{
+							"origin": [-3.29333, -1.15682, 2],
+							"size": [1, 7, 0],
+							"pivot": [-3.2883, 1.90886, 2],
+							"rotation": [-180, 22.5, 135],
+							"uv": {
+								"south": {"uv": [16, 8], "uv_size": [1, 7]}
+							}
+						},
+						{
+							"origin": [-2.29333, 1.09318, 2],
+							"size": [1, 6, 0],
+							"pivot": [-2.2883, 3.65886, 2],
+							"rotation": [0, 45, -45],
+							"uv": {
+								"south": {"uv": [16, 8], "uv_size": [1, 6]}
+							}
+						},
+						{
+							"origin": [-2.29333, 1.09318, 4],
+							"size": [1, 6, 0],
+							"pivot": [-2.2883, 3.65886, 4],
+							"rotation": [0, -45, -45],
+							"uv": {
+								"north": {"uv": [16, 8], "uv_size": [1, 6]}
+							}
+						},
+						{
+							"origin": [-3.29333, -1.15682, 4],
+							"size": [1, 7, 0],
+							"pivot": [-3.2883, 1.90886, 4],
+							"rotation": [180, -45, 135],
+							"uv": {
+								"south": {"uv": [16, 8], "uv_size": [1, 7]}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,34 @@
+package com.github.elenterius.biomancy.crafting.recipe;
+
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeInput;
+
+public abstract non-sealed class StaticProcessingRecipe implements ProcessingRecipe {
+
+	private final ResourceLocation id;
+
+	protected final int craftingTimeTicks;
+	protected final int craftingCostNutrients;
+
+	protected StaticProcessingRecipe(ResourceLocation id, int craftingTimeTicks, int craftingCostNutrients) {
+		this.id = id;
+		this.craftingTimeTicks = craftingTimeTicks;
+		this.craftingCostNutrients = craftingCostNutrients;
+	}
+
+	@Override
+	public final ResourceLocation getId() {
+		return id;
+	}
+
+	@Override
+	public final int getCraftingTimeTicks(RecipeInput inputInventory) {
+		return craftingTimeTicks;
+	}
+
+	@Override
+	public final int getCraftingCostNutrients(RecipeInput inputInventory) {
+		return craftingCostNutrients;
+	}
+
+}
