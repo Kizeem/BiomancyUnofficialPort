@@ -22,6 +22,11 @@ public final class PartyTimeShaderHandler {
 
 	private PartyTimeShaderHandler() {}
 
+	/// Called when shaders are (re)registered so a stale Uniform from a previous ShaderInstance isn't reused.
+	public static void resetTimeUniform() {
+		time = null;
+	}
+
 	@Nullable
 	private static Uniform getTimeUniform() {
 		ShaderInstance shader = ModRenderTypes.getEntityCutoutPartyTimeShaderOrNull();

@@ -1,6 +1,7 @@
 package com.github.elenterius.biomancy.init.client;
 
 import com.github.elenterius.biomancy.BiomancyMod;
+import com.github.elenterius.biomancy.client.render.PartyTimeShaderHandler;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
@@ -30,6 +31,7 @@ public final class ModRenderTypes {
 	@SubscribeEvent
 	public static void registerShaders(final RegisterShadersEvent event) throws IOException {
 		event.registerShader(new ShaderInstance(event.getResourceProvider(), BiomancyMod.rl("entity_cutout_party_time"), DefaultVertexFormat.NEW_ENTITY), instance -> entityCutoutPartyTimeShader = instance);
+		PartyTimeShaderHandler.resetTimeUniform(); // drop cached Uniform from the previous ShaderInstance
 	}
 
 	public static RenderType getCutoutPartyTime(ResourceLocation textureLocation) {
