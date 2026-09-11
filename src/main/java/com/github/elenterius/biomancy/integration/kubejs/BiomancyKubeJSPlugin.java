@@ -6,6 +6,8 @@ import com.github.elenterius.biomancy.api.tribute.SimpleTribute;
 import com.github.elenterius.biomancy.api.tribute.Tributes;
 import com.github.elenterius.biomancy.block.cradle.PrimordialCradleEvents;
 import com.github.elenterius.biomancy.crafting.EssenceIngredient;
+import com.github.elenterius.biomancy.crafting.IngredientStack;
+import com.github.elenterius.biomancy.crafting.VariableOutput;
 import com.github.elenterius.biomancy.crafting.recipe.RecipeUtil;
 import com.github.elenterius.biomancy.entity.mob.fleshblob.FleshBlob;
 import com.github.elenterius.biomancy.init.ModBioForgeTabs;
@@ -98,7 +100,11 @@ public class BiomancyKubeJSPlugin implements KubeJSPlugin {
 		RecipeKey<Ingredient> INGREDIENT = IngredientComponent.INGREDIENT.instance().inputKey(RecipeUtil.JsonKeys.INGREDIENT);
 		RecipeKey<List<Ingredient>> INGREDIENTS = IngredientComponent.INGREDIENT.instance().asList().inputKey(RecipeUtil.JsonKeys.INGREDIENTS);
 
+		RecipeKey<IngredientStack> INGREDIENT_STACK = IngredientStackComponent.INGREDIENT_STACK.instance().inputKey(RecipeUtil.JsonKeys.INGREDIENT);
+		RecipeKey<List<IngredientStack>> INGREDIENT_STACKS = IngredientStackComponent.INGREDIENT_STACK.instance().asList().inputKey(RecipeUtil.JsonKeys.INGREDIENTS);
+
 		RecipeKey<ItemStack> RESULT = ItemStackComponent.ITEM_STACK.instance().outputKey(RecipeUtil.JsonKeys.RESULT);
+		RecipeKey<List<VariableOutput>> VARIABLE_OUTPUTS = VariableOutputComponent.VARIABLE_OUTPUT.instance().asList().outputKey(RecipeUtil.JsonKeys.RESULTS);
 
 		RecipeKey<Integer> PROCESSING_TIME = NumberComponent.INT.otherKey(RecipeUtil.JsonKeys.PROCESSING_TIME).defaultOptional();
 		RecipeKey<Integer> NUTRIENTS_COST = NumberComponent.INT.otherKey(RecipeUtil.JsonKeys.NUTRIENTS_COST).defaultOptional();
@@ -108,7 +114,7 @@ public class BiomancyKubeJSPlugin implements KubeJSPlugin {
 		RecipeSchema DIGESTING_SCHEMA = new RecipeSchema(RecipeKeys.INGREDIENT, RecipeKeys.RESULT, RecipeKeys.PROCESSING_TIME, RecipeKeys.NUTRIENTS_COST);
 
 		RecipeKey<Ingredient> REACTANT = IngredientComponent.INGREDIENT.instance().inputKey(RecipeUtil.JsonKeys.REACTANT);
-		RecipeSchema BIO_BREWING_SCHEMA = new RecipeSchema(RecipeKeys.INGREDIENTS, REACTANT, RecipeKeys.RESULT, RecipeKeys.PROCESSING_TIME, RecipeKeys.NUTRIENTS_COST);
+		RecipeSchema BIO_BREWING_SCHEMA = new RecipeSchema(RecipeKeys.INGREDIENT_STACKS, REACTANT, RecipeKeys.RESULT, RecipeKeys.PROCESSING_TIME, RecipeKeys.NUTRIENTS_COST);
 	}
 
 	interface BioForgingRecipeSchema {
@@ -119,9 +125,7 @@ public class BiomancyKubeJSPlugin implements KubeJSPlugin {
 	}
 
 	interface DecomposingRecipeSchema {
-		RecipeKey<List<ItemStack>> RESULTS = ItemStackComponent.ITEM_STACK.instance().asList().outputKey(RecipeUtil.JsonKeys.RESULTS);
-
-		RecipeSchema SCHEMA = new RecipeSchema(RecipeKeys.INGREDIENT, RESULTS, RecipeKeys.PROCESSING_TIME, RecipeKeys.NUTRIENTS_COST);
+		RecipeSchema SCHEMA = new RecipeSchema(RecipeKeys.INGREDIENT_STACK, RecipeKeys.VARIABLE_OUTPUTS, RecipeKeys.PROCESSING_TIME, RecipeKeys.NUTRIENTS_COST);
 	}
 
 	interface EssenceIngredientUtil {

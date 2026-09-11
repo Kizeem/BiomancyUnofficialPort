@@ -63,7 +63,7 @@ ServerEvents.recipes(event => {
 	const itemStack = Biomancy$EssenceItem.fromTier('minecraft:turtle', 2)
 	event.recipes.biomancy.bio_forging([ingredient, 'minecraft:stick'], itemStack, 'foobar:test_tab').nutrientsCost(42)
 
-	event.recipes.biomancy.decomposing('minecraft:coal_block', [OutputItem.of('minecraft:diamond').withRolls(-4, 128), Item.of('minecraft:stick', 64)]).processingTime(20 * 2).nutrientsCost(42)
+	event.recipes.biomancy.decomposing('minecraft:coal_block', [Item.of('minecraft:diamond'), Item.of('minecraft:stick', 64)]).processingTime(20 * 2).nutrientsCost(42)
 })
 
 BiomancyEvents.canCradleSpawnMob(event => {
